@@ -1,0 +1,22 @@
+{
+  "lib": "ESNext",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "lib": [
+      "ESNext"
+    ],
+    "sourceMap": true,
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "Node",
+    "noImplicitAny": false,
+    "strict": true,
+    "strictNullChecks": false
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
