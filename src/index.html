@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Backlight Control</title>
+</head>
+<body>
+  <button id="up">Backlight UP</button>
+  <button id="down">Backlight DOWN</button>
+  <button id="info"> Info </button>
+
+  <script>
+    document.getElementById('up').addEventListener('click', function() {
+      // Add your function for backlight UP here
+      console.log('Backlight UP button clicked');
+      fetch('http://192.168.1.11:3001/backlightUp')
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    });
+
+    document.getElementById('down').addEventListener('click', function() {
+      // Add your function for backlight DOWN here
+      console.log('Backlight DOWN button clicked');
+      fetch('http://192.168.1.11:3001/backlightDown')
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+
+    });
+    document.getElementById('info').addEventListener('click', function() {
+      // Add your function for backlight DOWN here
+      console.log('Info button clicked');
+      fetch('http://192.168.1.11:3001/info')
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+      });
+  </script>
+</body>
+</html>
