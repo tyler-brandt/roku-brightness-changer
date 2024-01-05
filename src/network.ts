@@ -72,7 +72,7 @@ export const CheckRokuAddress = async (address: string): Promise<boolean> => {
       explicitArray: false,
       trim: true,
     });
-    console.log({ info });
+    // console.log({ info });
   } catch (error) {
     return false;
   }
