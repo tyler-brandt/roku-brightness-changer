@@ -25,8 +25,10 @@ export const GetRokuAddress = async (): Promise<string> => {
         clearTimeout(socketTimeout);
 
         const locationMatch = response.match(/LOCATION: (.*)/i);
-        if (!locationMatch || !locationMatch[1])
-          reject('Could not parse LOCATION from roku device response');
+        if (!locationMatch || !locationMatch[1]) {
+          reject(new Error('Could not parse LOCATION from roku device response'));
+          return;
+        }
 
         RokuAddress = locationMatch[1].trim();
         resolve(locationMatch[1].trim());
@@ -79,13 +81,16 @@ export const CheckRokuAddress = async (): Promise<boolean> => {
   try {
     if (!RokuAddress) return false;
 
-    const { data: deviceInfo } = await axios.get(`${RokuAddress}/query/device-info`);
-    const info = await xml2js.parseStringPromise(deviceInfo, {
+    const { data: deviceInfo } = await axios.get<{ deviceInfo: string }>(
+      `${RokuAddress}/query/device-info`,
+    );
+    await xml2js.parseStringPromise(deviceInfo, {
       explicitArray: false,
       trim: true,
     });
     // console.log({ info });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error((error as Error).message);
     return false;
   }
   return true;

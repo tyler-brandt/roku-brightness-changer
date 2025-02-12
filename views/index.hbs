@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Backlight Control</title>
+
+  <link rel="icon" href="/favicon.png" type="image/x-icon">
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      font-size: 30px;
+      background-color: #4f4e4e;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 50px;
+      border-radius: 8px;
+      background-color: darkgrey;
+    }
+
+    #info-display {
+      background-color: #282828;
+      color: #d8d8d8;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    div {
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="up">Backlight UP</button><br>
+  <button id="down">Backlight DOWN</button><br>
+  <button id="info">Refresh Info</button><br>
+
+  <div id="info-display">{{ info }}</div>
+
+  <script>
+    const serverUrl = '{{serverUrl}}';
+
+    const eventListeners = {
+      brightnessUp: async () => {
+        console.log('Backlight UP button clicked');
+        try {
+          const response = await fetch(`${serverUrl}/backlightUp`);
+          const data = await response.text();
+          console.log(data);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      },
+      brightnessDown: async () => {
+        console.log('Backlight DOWN button clicked');
+        try {
+          const response = await fetch(`${serverUrl}/backlightDown`);
+          const data = await response.text();
+          console.log(data);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      },
+      info: async () => {
+        console.log('Info button clicked');
+        try {
+          const response = await fetch(`${serverUrl}/info`);
+          const data = await response.text();
+          console.log(data);
+          document.getElementById('info-display').innerHTML = data;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      },
+    };
+
+    document.getElementById('up').addEventListener('click', eventListeners.brightnessUp);
+    document.getElementById('down').addEventListener('click', eventListeners.brightnessDown);
+    document.getElementById('info').addEventListener('click', eventListeners.info);
+
+    // eagerly fetch the info
+    // eventListeners.info();
+
+  </script>
+</body>
+
+</html>
