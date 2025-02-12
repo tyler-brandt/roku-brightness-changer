@@ -2,6 +2,8 @@ import axios from 'axios';
 import { createSocket } from 'dgram';
 import xml2js from 'xml2js';
 
+export let RokuAddress: string;
+
 export const GetRokuAddress = async (): Promise<string> => {
   return new Promise((resolve, reject) => {
     const MULTICAST_ADDRESS = '239.255.255.250';
@@ -26,6 +28,7 @@ export const GetRokuAddress = async (): Promise<string> => {
         if (!locationMatch || !locationMatch[1])
           reject('Could not parse LOCATION from roku device response');
 
+        RokuAddress = locationMatch[1].trim();
         resolve(locationMatch[1].trim());
       }
     });
@@ -55,19 +58,28 @@ export const GetRokuAddress = async (): Promise<string> => {
         '\r\n',
     );
 
-    socket.send(message, 0, message.length, MULTICAST_PORT, MULTICAST_ADDRESS, err => {
-      if (err) {
-        console.error('Error sending M-SEARCH request:', err);
-      } else {
-        console.log('M-SEARCH request sent');
-      }
-    });
+    socket.send(
+      new Uint8Array(message),
+      0,
+      message.length,
+      MULTICAST_PORT,
+      MULTICAST_ADDRESS,
+      err => {
+        if (err) {
+          console.error('Error sending M-SEARCH request:', err);
+        } else {
+          console.log('M-SEARCH request sent');
+        }
+      },
+    );
   });
 };
 
-export const CheckRokuAddress = async (address: string): Promise<boolean> => {
+export const CheckRokuAddress = async (): Promise<boolean> => {
   try {
-    const { data: deviceInfo } = await axios.get(`${address}/query/device-info`);
+    if (!RokuAddress) return false;
+
+    const { data: deviceInfo } = await axios.get(`${RokuAddress}/query/device-info`);
     const info = await xml2js.parseStringPromise(deviceInfo, {
       explicitArray: false,
       trim: true,
