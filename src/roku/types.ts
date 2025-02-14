@@ -1,3 +1,11 @@
+export type RokuDevice = {
+  name: string;
+  address: string;
+  deviceId: string;
+  deviceInfo: DeviceInfo;
+  stringifiedDeviceInfo: string;
+};
+
 export type DeviceInfo = {
   udn: string;
   'serial-number': string;

@@ -22,6 +22,21 @@
       background-color: darkgrey;
     }
 
+    select {
+      margin: 10px 10px 20px 10px;
+      padding: 10px;
+      font-size: 50px;
+      border-radius: 8px;
+      background-color: lightgrey;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="%23000" stroke-width="4" d="M4 8l8 8 8-8"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 24px;
+    }
+
     #info-display {
       background-color: #282828;
       color: #d8d8d8;
@@ -40,20 +55,33 @@
 </head>
 
 <body>
+  <select id="device-select">
+    {{#devices}}
+      <option value="{{this.deviceId}}">{{this.name}}</option>
+    {{/devices}}
+  </select>
+
   <button id="up">Backlight UP</button><br>
   <button id="down">Backlight DOWN</button><br>
   <button id="info">Refresh Info</button><br>
+  <button id="test">Test</button><br>
 
-  <div id="info-display">{{ info }}</div>
+  <div id="info-display">{{ devices.[0].stringifiedDeviceInfo }}</div>
 
   <script>
     const serverUrl = '{{serverUrl}}';
+
+    const getSelectedDeviceId = () => {
+      const select = document.getElementById('device-select');
+      return select.value;
+    };
 
     const eventListeners = {
       brightnessUp: async () => {
         console.log('Backlight UP button clicked');
         try {
-          const response = await fetch(`${serverUrl}/backlightUp`, { method: 'POST' });
+          const deviceId = getSelectedDeviceId();
+          const response = await fetch(`${serverUrl}/backlightUp?deviceId=${deviceId}`, { method: 'POST' });
           const data = await response.text();
           console.log(data);
         } catch (error) {
@@ -63,7 +91,8 @@
       brightnessDown: async () => {
         console.log('Backlight DOWN button clicked');
         try {
-          const response = await fetch(`${serverUrl}/backlightDown`, { method: 'POST' });
+          const deviceId = getSelectedDeviceId();
+          const response = await fetch(`${serverUrl}/backlightDown?deviceId=${deviceId}`, { method: 'POST' });
           const data = await response.text();
           console.log(data);
         } catch (error) {
@@ -73,10 +102,22 @@
       info: async () => {
         console.log('Info button clicked');
         try {
-          const response = await fetch(`${serverUrl}/info`);
+          const deviceId = getSelectedDeviceId();
+          console.log(deviceId);
+          const response = await fetch(`${serverUrl}/info?deviceId=${deviceId}`);
           const data = await response.text();
           console.log(data);
           document.getElementById('info-display').innerHTML = data;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      },
+      test: async () => {
+        console.log('Info button clicked');
+        try {
+          const response = await fetch(`${serverUrl}/test`);
+          const data = await response.text();
+          console.log(data);
         } catch (error) {
           console.error('Error:', error);
         }
@@ -86,6 +127,7 @@
     document.getElementById('up').addEventListener('click', eventListeners.brightnessUp);
     document.getElementById('down').addEventListener('click', eventListeners.brightnessDown);
     document.getElementById('info').addEventListener('click', eventListeners.info);
+    document.getElementById('test').addEventListener('click', eventListeners.test);
 
     // eagerly fetch the info
     // eventListeners.info();

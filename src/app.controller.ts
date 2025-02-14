@@ -1,28 +1,35 @@
-import { Controller, Get, Post, Render } from '@nestjs/common';
+import { Controller, Get, Post, Query, Render } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Commands } from 'src/network/keys';
+import { Commands } from 'src/roku/rokuCommands';
+import { RokuService } from 'src/roku/roku.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly rokuService: RokuService,
+  ) {}
 
   @Get()
   @Render('index')
-  async root() {
-    return { info: await this.appService.getDeviceInfo(), serverUrl: 'http://192.168.1.11:3000' };
+  root() {
+    return {
+      serverUrl: 'http://192.168.1.11:3000',
+      devices: Object.values(this.rokuService.getRokuDevices()),
+    };
   }
 
   @Post('backlightUp')
-  async backlightUp() {
-    await this.appService.sendKeySequence(Commands.backlightUp);
+  async backlightUp(@Query('deviceId') deviceId: string) {
+    await this.rokuService.sendKeySequence(deviceId, Commands.backlightUp);
   }
   @Post('backlightDown')
-  async backlightDown() {
-    await this.appService.sendKeySequence(Commands.backlightDown);
+  async backlightDown(@Query('deviceId') deviceId: string) {
+    await this.rokuService.sendKeySequence(deviceId, Commands.backlightDown);
   }
   @Get('info')
-  async info() {
-    const info = await this.appService.getDeviceInfo();
-    return info;
+  async info(@Query('deviceId') deviceId: string) {
+    const info = await this.rokuService.getDeviceInfo({ deviceId });
+    return JSON.stringify(info, null, 2);
   }
 }
